@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
+  <div class="scroll-progress" id="scroll-progress"></div>
   <div class="ambient ambient-a"></div>
   <div class="ambient ambient-b"></div>
   <div class="doodle doodle-a"></div>
@@ -19,7 +20,7 @@
 
   <header class="topbar" id="top">
     <div class="shell topbar-inner">
-      <a class="monogram" href="#top" aria-label="Home">PP</a>
+      <a class="brandmark" href="#home" aria-label="Back to top"><span class="brandmark-dot"></span><span class="brandmark-text">Prashant Patidar</span></a>
       <nav class="menu">
         <a href="#impact">Impact</a>
         <a href="#story">Story</a>
@@ -32,7 +33,7 @@
   </header>
 
   <main>
-    <section class="hero shell reveal">
+    <section id="home" class="hero shell reveal">
       <div class="hero-copy">
         <div class="profile-chip">
           <img src="./assets/profile.jpg" alt="Prashant Patidar profile photo" class="profile-photo" />

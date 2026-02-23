@@ -10,6 +10,19 @@
     }
   });
 
+  const brandmark = document.querySelector('.brandmark');
+  if (brandmark) {
+    brandmark.addEventListener('click', (e) => {
+      e.preventDefault();
+      const home = document.getElementById('home');
+      if (home) {
+        home.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -80,10 +93,36 @@
   counterEls.forEach((el) => counterObserver.observe(el));
 
   const ticker = document.querySelector('.ticker-track');
-  if (ticker && !ticker.dataset.cloned) {
-    ticker.innerHTML += ticker.innerHTML;
-    ticker.dataset.cloned = 'true';
-  }
+  const initTickerLoop = () => {
+    if (!ticker) return;
+
+    const baseItems = ticker.dataset.baseItems || ticker.innerHTML;
+    ticker.dataset.baseItems = baseItems;
+
+    const groupA = document.createElement('div');
+    groupA.className = 'ticker-group';
+    groupA.innerHTML = baseItems;
+
+    ticker.innerHTML = '';
+    ticker.appendChild(groupA);
+
+    // Measure only after mounting, and cap repetitions to avoid runaway loops.
+    let guard = 0;
+    while (groupA.scrollWidth < window.innerWidth * 1.2 && guard < 20) {
+      groupA.insertAdjacentHTML('beforeend', baseItems);
+      guard += 1;
+    }
+
+    const groupB = groupA.cloneNode(true);
+    ticker.appendChild(groupB);
+
+    const shiftPx = Math.max(groupA.scrollWidth, 1);
+    ticker.style.setProperty('--ticker-shift', `${shiftPx}px`);
+    ticker.style.setProperty('--ticker-duration', `${Math.max(18, shiftPx / 80)}s`);
+  };
+
+  initTickerLoop();
+  window.addEventListener('resize', initTickerLoop);
 
   // Use viewport center distance for stable story dot activation.
   const storyCards = Array.from(document.querySelectorAll('.story-card'));
@@ -118,6 +157,17 @@
     window.addEventListener('scroll', syncStoryDotsByScroll, { passive: true });
     window.addEventListener('resize', syncStoryDotsByScroll);
   }
+
+  const progressBar = document.getElementById('scroll-progress');
+  const syncScrollProgress = () => {
+    if (!progressBar) return;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0;
+    progressBar.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+  };
+  syncScrollProgress();
+  window.addEventListener('scroll', syncScrollProgress, { passive: true });
+  window.addEventListener('resize', syncScrollProgress);
 
   const menuLinks = Array.from(document.querySelectorAll('.menu a'));
   const sections = menuLinks
